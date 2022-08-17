@@ -1,3 +1,3 @@
-from .main import dong
+from .daner import dong
 
-__all__ = (dong)
+__all__ = dong
