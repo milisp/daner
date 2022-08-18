@@ -30,3 +30,11 @@ classifiers = [
 dev = [
     "pytest>=7.1.2",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
