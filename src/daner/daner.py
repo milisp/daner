@@ -18,9 +18,9 @@ def _get_key(arg: str) -> str:
     """
     :arg str: -u or --user
     """
-    if arg.startswith("--"):
+    if arg.count("-") == 2:
         key = arg[2:]
-    elif arg.startswith("-"):
+    elif arg.count("-") == 1:
         key = arg[1:]
     return key
 
@@ -38,11 +38,14 @@ def _set_alias(alias: dict, obj_in: dict) -> dict:
         return obj_in
 
 
-def _parse_args(args: list) -> dict:
+def _parse_args(args: list, alias: dict = {}) -> dict:
     """
     :args list: ["--name", "milisp"]
     :return dict: {"name": "milisp"}
     """
+    if not alias and any([arg.count("-") == 1 for arg in args]):
+        echo_red("no alias")
+        exit(1)
     obj_in = {}
     for i, arg in enumerate(args):
         if i % 2 == 0:
@@ -62,7 +65,7 @@ def check_email(obj_in: dict, k: str) -> bool | None:
     """
 
     if k == "email":
-        if not re.search("(\w+@\w+.\w+)", obj_in[k]) or not re.match(
+        if not re.search("(\w+@\w+.\w+)", obj_in[k]) or not re.match(  # noqa
             "[a-z]", obj_in[k]
         ):
             echo_red("error email")
@@ -70,7 +73,7 @@ def check_email(obj_in: dict, k: str) -> bool | None:
         return True
 
 
-def dong(alias: dict = None, help: str = "", sync: bool = False):
+def dong(alias: dict = {}, help: str = "", sync: bool = False):
     """
     example:
     @dong()
@@ -96,7 +99,7 @@ def dong(alias: dict = None, help: str = "", sync: bool = False):
             commands.append({func.__name__: str(sig)})
 
             if sub_cmd == func.__name__:
-                obj_in = _parse_args(new_args)
+                obj_in = _parse_args(new_args, alias)
                 if alias:
                     obj_in = _set_alias(alias, obj_in)
                 annotations = inspect.get_annotations(func)
